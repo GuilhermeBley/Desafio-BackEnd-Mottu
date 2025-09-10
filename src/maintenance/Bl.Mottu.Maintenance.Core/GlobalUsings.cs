@@ -1,0 +1,1 @@
+﻿global using Bl.Mottu.Maintenance.Core.Primitive;

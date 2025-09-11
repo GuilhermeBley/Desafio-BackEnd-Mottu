@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace Bl.Mottu.Maintenance.Core.Primitive;
 
@@ -48,8 +49,38 @@ public class Result
     /// Failed result without value
     /// </summary>
     /// <exception cref="ArgumentNullException"></exception>
+    public static Result Failed(params CoreExceptionCode[] errors)
+    {
+        return Failed(
+            errors: errors.Select(x => new Error(x.ToString(), x)));
+    }
+
+    /// <summary>
+    /// Failed result without value
+    /// </summary>
+    /// <exception cref="ArgumentNullException"></exception>
     public static Result Failed(IEnumerable<ICoreException> errors)
         => new(
+            false,
+            errors?.ToList().AsReadOnly() ?? throw new ArgumentNullException("errors"));
+
+    /// <summary>
+    /// Failed result
+    /// </summary>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static Result<TResult> Failed<TResult>(params CoreExceptionCode[] errors)
+    {
+        return Failed<TResult>(
+            errors: errors.Select(x => new Error(x.ToString(), x)));
+    }
+
+    /// <summary>
+    /// Failed result
+    /// </summary>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static Result<TResult> Failed<TResult>(IEnumerable<ICoreException> errors)
+        => new Result<TResult>(
+            default,
             false,
             errors?.ToList().AsReadOnly() ?? throw new ArgumentNullException("errors"));
 
@@ -89,6 +120,14 @@ public class Result<TResult> : Result
 
         result = _result;
         return true;
+    }
+
+    /// <summary>
+    /// Cast as error, used just to return the errors
+    /// </summary>
+    public Result<TCast> Cast<TCast>()
+    {
+        return new Result<TCast>(default, false, this.Errors);
     }
 
     /// <summary>

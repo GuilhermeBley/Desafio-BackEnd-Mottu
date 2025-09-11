@@ -1,10 +1,13 @@
 ﻿
+using System.Numerics;
+
 namespace Bl.Mottu.Maintenance.Core.Entities;
 
 public class Motorcycle
 {
     public Guid Id { get; private set; }
     public string Placa { get; private set; } = string.Empty;
+    public string Code { get; private set; } = string.Empty;
     public string Model { get; private set; } = string.Empty;
     public int Year { get; private set; }
     public DateTime CreatedAt { get; private set; }
@@ -16,6 +19,7 @@ public class Motorcycle
         return obj is Motorcycle motorcycle &&
                Id.Equals(motorcycle.Id) &&
                Placa == motorcycle.Placa &&
+               Code == motorcycle.Code &&
                Model == motorcycle.Model &&
                Year == motorcycle.Year &&
                CreatedAt == motorcycle.CreatedAt;
@@ -23,12 +27,13 @@ public class Motorcycle
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Id, Placa, Model, Year, CreatedAt);
+        return HashCode.Combine(Id, Placa, Model, Year, Code, CreatedAt);
     }
 
     public static Result<Motorcycle> Create(
         string placa,
         string model,
+        string code,
         int year,
         DateTime? createdAt = null,
         Guid? id = null)
@@ -36,9 +41,11 @@ public class Motorcycle
         ResultBuilder<Motorcycle> builder = new();
 
         placa = placa ?? string.Empty;
-        placa = string.Concat(placa.Where(char.IsLetterOrDigit));
+        placa = NormalizePlaca(placa);
         model = model ?? string.Empty;
+        code = code ?? string.Empty;
         model = model.Trim().ToUpperInvariant();
+        code = code.Trim().ToUpperInvariant();
 
         builder.AddIf(year < 1900, CoreExceptionCode.InvalidYear);
         builder.AddIf(placa.Length != 7, CoreExceptionCode.InvalidPlate);
@@ -48,6 +55,7 @@ public class Motorcycle
         {
             return new Motorcycle()
             {
+                Code = code,
                 CreatedAt = createdAt ?? DateTime.UtcNow,
                 Id= id ?? Guid.NewGuid(),
                 Model = model,
@@ -55,5 +63,15 @@ public class Motorcycle
                 Placa = placa,
             };
         });
+    }
+
+    public static string NormalizePlaca(string? i)
+    {
+        if (string.IsNullOrEmpty(i)) return string.Empty;
+        var plate = string.Concat(i.Where(char.IsLetterOrDigit));
+
+        if (plate.Length != 7) return string.Empty;
+
+        return plate;
     }
 }

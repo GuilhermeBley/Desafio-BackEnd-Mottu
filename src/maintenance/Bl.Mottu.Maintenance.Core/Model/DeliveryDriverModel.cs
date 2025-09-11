@@ -21,7 +21,7 @@ public class DeliveryDriverModel
             Cnpj = entity.Cnpj,
             BirthDate = entity.BirthDate,
             CnhCategory= entity.CnhCategory,
-            CnhImg = entity.CnhImg,
+            CnhImg = entity.CnhImgUrl,
             CreatedAt = entity.CreatedAt,
         };
     }

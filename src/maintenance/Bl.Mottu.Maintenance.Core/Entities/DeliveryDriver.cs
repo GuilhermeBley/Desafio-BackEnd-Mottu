@@ -8,7 +8,7 @@ public class DeliveryDriver
     public DateOnly BirthDate { get; private set; }
     public string CnhNumber { get; private set; } = string.Empty;
     public string CnhCategory { get; private set; } = string.Empty;
-    public string CnhImg { get; private set; } = string.Empty;
+    public Uri? CnhImgUrl { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
     private DeliveryDriver() { }
@@ -22,7 +22,7 @@ public class DeliveryDriver
                BirthDate == driver.BirthDate &&
                CnhNumber == driver.CnhNumber &&
                CnhCategory == driver.CnhCategory &&
-               CnhImg == driver.CnhImg &&
+               CnhImgUrl == driver.CnhImgUrl &&
                CreatedAt == driver.CreatedAt;
     }
 
@@ -35,7 +35,7 @@ public class DeliveryDriver
         hash.Add(BirthDate);
         hash.Add(CnhNumber);
         hash.Add(CnhCategory);
-        hash.Add(CnhImg);
+        hash.Add(CnhImgUrl);
         hash.Add(CreatedAt);
         return hash.ToHashCode();
     }
@@ -46,7 +46,7 @@ public class DeliveryDriver
         DateOnly birthdate,
         string cnhNumber,
         string cnhKind,
-        string cnhImage,
+        string? cnhImageUrl,
         DateTime? createdAt = null,
         Guid? id = null)
     {
@@ -57,7 +57,7 @@ public class DeliveryDriver
         cnhNumber = cnhNumber?.Trim() ?? string.Empty;
         cnhNumber = string.Concat(cnhNumber.Where(char.IsNumber));
         cnhKind = cnhKind?.Trim().ToUpperInvariant() ?? string.Empty;
-        cnhImage = cnhImage?.Trim() ?? string.Empty;
+        cnhImageUrl = string.IsNullOrWhiteSpace(cnhImageUrl) ? null : cnhImageUrl;
 
         builder.AddIf(string.IsNullOrWhiteSpace(name), CoreExceptionCode.InvalidName);
         builder.AddIf(name.Length < 2 || name.Length > 250, CoreExceptionCode.InvalidName);
@@ -73,7 +73,11 @@ public class DeliveryDriver
         builder.AddIf(string.IsNullOrWhiteSpace(cnhKind), CoreExceptionCode.InvalidCnhType);
         builder.AddIf(!new[] { "A", "B", "AB" }.Contains(cnhKind), CoreExceptionCode.InvalidCnhType);
 
-        builder.AddIf(string.IsNullOrWhiteSpace(cnhImage), CoreExceptionCode.InvalidCnhImage);
+        builder.AddIf(string.IsNullOrWhiteSpace(cnhImageUrl), CoreExceptionCode.InvalidCnhImage);
+
+        Uri? cnhImageUri = null;
+        if (cnhImageUrl != null)
+            builder.AddIf(Uri.TryCreate(cnhImageUrl, default, out cnhImageUri) is false, CoreExceptionCode.InvalidCnhImage);
 
         return builder.CreateResult(() =>
         {
@@ -85,7 +89,7 @@ public class DeliveryDriver
                 BirthDate = birthdate,
                 CnhNumber = cnhNumber,
                 CnhCategory = cnhKind,
-                CnhImg = cnhImage,
+                CnhImgUrl = cnhImageUri,
                 CreatedAt = createdAt ?? DateTime.UtcNow
             };
         });

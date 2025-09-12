@@ -13,7 +13,7 @@ public class VehicleRentModel
     public int Plan { get; set; }
     public DateTime CreatedAt { get; set; }
 
-    public static VehicleRentModel MapByEntity(VehicleRent entity)
+    public static VehicleRentModel MapFromEntity(VehicleRent entity)
     {
         return new VehicleRentModel
         {

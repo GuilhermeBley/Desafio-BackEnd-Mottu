@@ -27,4 +27,5 @@ public enum CoreExceptionCode
     LateReturn = 400_13,
     InvalidRentalPlan = 400_13,
     PlanMismatch = 400_14,
+    DriverHasInsufficientCategory = 400_15,
 }

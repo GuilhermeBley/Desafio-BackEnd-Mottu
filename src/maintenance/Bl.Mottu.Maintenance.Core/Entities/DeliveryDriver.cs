@@ -1,8 +1,11 @@
-﻿namespace Bl.Mottu.Maintenance.Core.Entities;
+﻿using Bl.Mottu.Maintenance.Core.ValueObjects;
+
+namespace Bl.Mottu.Maintenance.Core.Entities;
 
 public class DeliveryDriver
 {
     public Guid Id { get; private set; }
+    public CodeId Code { get; private set; }
     public string Name { get; private set; } = string.Empty;
     public string Cnpj { get; private set; } = string.Empty;
     public DateOnly BirthDate { get; private set; }
@@ -17,6 +20,7 @@ public class DeliveryDriver
     {
         return obj is DeliveryDriver driver &&
                Id.Equals(driver.Id) &&
+               Code == driver.Code &&
                Name == driver.Name &&
                Cnpj == driver.Cnpj &&
                BirthDate == driver.BirthDate &&
@@ -30,6 +34,7 @@ public class DeliveryDriver
     {
         HashCode hash = new HashCode();
         hash.Add(Id);
+        hash.Add(Code);
         hash.Add(Name);
         hash.Add(Cnpj);
         hash.Add(BirthDate);
@@ -41,6 +46,7 @@ public class DeliveryDriver
     }
 
     public static Result<DeliveryDriver> Create(
+        string code,
         string name,
         string cnpj,
         DateOnly birthdate,
@@ -89,6 +95,7 @@ public class DeliveryDriver
                 BirthDate = birthdate,
                 CnhNumber = cnhNumber,
                 CnhCategory = cnhKind,
+                Code = new(code),
                 CnhImgUrl = cnhImageUri,
                 CreatedAt = createdAt ?? DateTime.UtcNow
             };

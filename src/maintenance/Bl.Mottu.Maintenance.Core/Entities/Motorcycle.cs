@@ -7,7 +7,7 @@ public class Motorcycle
 {
     public Guid Id { get; private set; }
     public string Placa { get; private set; } = string.Empty;
-    public string Code { get; private set; } = string.Empty;
+    public CodeId Code { get; private set; }
     public string Model { get; private set; } = string.Empty;
     public int Year { get; private set; }
     public DateTime CreatedAt { get; private set; }
@@ -45,7 +45,6 @@ public class Motorcycle
         model = model ?? string.Empty;
         code = code ?? string.Empty;
         model = model.Trim().ToUpperInvariant();
-        code = code.Trim().ToUpperInvariant();
 
         builder.AddIf(year < 1900, CoreExceptionCode.InvalidYear);
         builder.AddIf(placa.Length != 7, CoreExceptionCode.InvalidPlate);
@@ -55,7 +54,7 @@ public class Motorcycle
         {
             return new Motorcycle()
             {
-                Code = code,
+                Code = new(code),
                 CreatedAt = createdAt ?? DateTime.UtcNow,
                 Id= id ?? Guid.NewGuid(),
                 Model = model,

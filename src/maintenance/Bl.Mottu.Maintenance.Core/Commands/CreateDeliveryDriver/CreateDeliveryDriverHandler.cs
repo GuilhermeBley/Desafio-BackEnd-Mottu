@@ -66,6 +66,18 @@ public class CreateDeliveryDriverHandler : IRequestHandler<CreateDeliveryDriverR
             return new(Result.Failed<DeliveryDriverModel>(CoreExceptionCode.Conflict));
         }
 
+        var hasAnyByCnpj =
+            await _context
+            .DeliveryDrivers
+            .AsNoTracking()
+            .Where(x => x.Cnpj == result.RequiredResult.Cnpj)
+            .AnyAsync(cancellationToken);
+
+        if (hasAnyByCnpj)
+        {
+            return new(Result.Failed<DeliveryDriverModel>(CoreExceptionCode.Conflict));
+        }
+
         var response = await _context.DeliveryDrivers
             .AddAsync(DeliveryDriverModel.MapFromEntity(result.RequiredResult));
 

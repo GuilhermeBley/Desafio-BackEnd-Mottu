@@ -62,6 +62,7 @@ public class DeliveryDriver
         cnpj = cnpj?.Trim() ?? string.Empty;
         cnhNumber = cnhNumber?.Trim() ?? string.Empty;
         cnhNumber = string.Concat(cnhNumber.Where(char.IsNumber));
+        cnpj = string.Concat(cnpj.Where(char.IsNumber));
         cnhKind = cnhKind?.Trim().ToUpperInvariant() ?? string.Empty;
         cnhImageUrl = string.IsNullOrWhiteSpace(cnhImageUrl) ? null : cnhImageUrl;
 

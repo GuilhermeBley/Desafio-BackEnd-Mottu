@@ -58,7 +58,7 @@ public class DeliveryDriver
     {
         ResultBuilder<DeliveryDriver> builder = new();
 
-        name = name?.Trim() ?? string.Empty;
+        name = (name?.Trim() ?? string.Empty).ToUpperInvariant();
         cnpj = cnpj?.Trim() ?? string.Empty;
         cnhNumber = cnhNumber?.Trim() ?? string.Empty;
         cnhNumber = string.Concat(cnhNumber.Where(char.IsNumber));
@@ -80,11 +80,9 @@ public class DeliveryDriver
         builder.AddIf(string.IsNullOrWhiteSpace(cnhKind), CoreExceptionCode.InvalidCnhType);
         builder.AddIf(!new[] { "A", "B", "AB" }.Contains(cnhKind), CoreExceptionCode.InvalidCnhType);
 
-        builder.AddIf(string.IsNullOrWhiteSpace(cnhImageUrl), CoreExceptionCode.InvalidCnhImage);
-
         Uri? cnhImageUri = null;
         if (cnhImageUrl != null)
-            builder.AddIf(Uri.TryCreate(cnhImageUrl, default, out cnhImageUri) is false, CoreExceptionCode.InvalidCnhImage);
+            builder.AddIf(Uri.TryCreate(cnhImageUrl, UriKind.Absolute, out cnhImageUri) is false, CoreExceptionCode.InvalidCnhImage);
 
         return builder.CreateResult(() =>
         {

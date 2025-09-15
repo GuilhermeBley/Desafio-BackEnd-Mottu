@@ -45,7 +45,7 @@ public class PatchDeliveryDriverPhotoHandler : IRequestHandler<PatchDeliveryDriv
         if (request.CnhImage != null)
         {
             var fileUri =
-                await _streamFileRepository.UploadAsync(request.CnhImage, $"{code}-cnh.png", cancellationToken);
+                await _streamFileRepository.UploadAsync(request.CnhImage, $"{modelFound.Id}-cnh.png", cancellationToken);
 
             await _context
                 .DeliveryDrivers

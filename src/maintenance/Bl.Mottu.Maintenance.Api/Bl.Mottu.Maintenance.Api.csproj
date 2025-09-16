@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
     <ProjectReference Include="..\Bl.Mottu.Maintenance.Infrastructure\Bl.Mottu.Maintenance.Infrastructure.csproj" />
@@ -8,6 +8,11 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>7977e026-7b5d-4edd-9d7b-298d9b688f1c</UserSecretsId>
   </PropertyGroup>
+	
+    <ItemGroup>
+	    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    </ItemGroup>
 
 </Project>

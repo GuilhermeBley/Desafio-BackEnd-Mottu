@@ -20,7 +20,7 @@ public class GetMotorcyclesHandler : IRequestHandler<GetMotorcyclesRequest, GetM
 
     public async Task<GetMotorcyclesResponse> Handle(GetMotorcyclesRequest request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.PlacaFilter))
+        if (string.IsNullOrEmpty(request.PlacaFilter) is false)
         {
             var placaFilter = Motorcycle.NormalizePlaca(request.PlacaFilter);
             var filteredModels = await 
@@ -33,7 +33,7 @@ public class GetMotorcyclesHandler : IRequestHandler<GetMotorcyclesRequest, GetM
             return new(filteredModels);
         }
 
-        if (string.IsNullOrEmpty(request.CodeFilter))
+        if (string.IsNullOrEmpty(request.CodeFilter) is false)
         {
             var filteredModels = await 
                 _context

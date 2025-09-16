@@ -1,6 +1,7 @@
 ﻿using Bl.Mottu.Maintenance.Core.Commands.CreateMotorcycle;
 using Bl.Mottu.Maintenance.Core.Primitive;
 using Bl.Mottu.Maintenance.Core.Repository;
+using Bl.Mottu.Maintenance.Infrastructure.Tests.Mock;
 using Smartec.Web.Infrastructure.Tests.TestBase;
 
 namespace Bl.Mottu.Maintenance.Infrastructure.Tests.Tests;
@@ -132,25 +133,8 @@ public class CreateMotorcycleTest
     {
         return new CreateMotorcycleRequest(
             Code: $"MOTO-{Guid.NewGuid().ToString()[..8].ToUpper()}",
-            Placa: GenerateRandomPlaca(),
+            Placa: PlacaMock.NextPlaca(),
             Model: "HONDA CB 500F",
             Year: Random.Shared.Next(2010, 2024));
-    }
-
-    private static string GenerateRandomPlaca()
-    {
-        var letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        var numbers = "0123456789";
-
-        var random = new Random();
-        var placa = $"{letters[random.Next(letters.Length)]}" +
-                   $"{letters[random.Next(letters.Length)]}" +
-                   $"{letters[random.Next(letters.Length)]}" +
-                   $"{numbers[random.Next(numbers.Length)]}" +
-                   $"{letters[random.Next(letters.Length)]}" +
-                   $"{numbers[random.Next(numbers.Length)]}" +
-                   $"{numbers[random.Next(numbers.Length)]}";
-
-        return placa;
     }
 }

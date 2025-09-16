@@ -161,6 +161,11 @@ public class PostgreDataContext(IOptions<PostgreConfig>? Options = null) : DataC
                 .HasColumnType("uuid")
                 .IsRequired();
 
+            b.Property(p => p.DailyValue)
+                .HasColumnName("daily_value")
+                .HasColumnType("NUMERIC(11, 2)")
+                .IsRequired();
+
             b.Property(p => p.StartAt)
                 .HasColumnName("start_at")
                 .HasColumnType("timestamp with time zone")

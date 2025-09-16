@@ -11,6 +11,7 @@ public class VehicleRentModel
     public DateTime? EndedAt { get; set; }
     public DateTime ExpectedEndingDate { get; set; }
     public int Plan { get; set; }
+    public decimal DailyValue { get; set; }
     public DateTime CreatedAt { get; set; }
 
     public static VehicleRentModel MapFromEntity(VehicleRent entity)
@@ -25,7 +26,7 @@ public class VehicleRentModel
             ExpectedEndingDate = entity.ExpectedEndingDate,
             Plan = entity.Plan,
             StartAt = entity.StartAt,
-
+            DailyValue = entity.DailyValue
         };
     }
 }

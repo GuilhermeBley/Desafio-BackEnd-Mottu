@@ -2,6 +2,16 @@
 
 public class VehicleRent
 {
+    // TODO: Change it to a database table
+    private static readonly IReadOnlyDictionary<int, decimal> _planDailyValues = new Dictionary<int, decimal>()
+    {
+        {7, 30},
+        {15, 28},
+        {30, 22},
+        {45, 20},
+        {50 ,18},
+    };
+
     public Guid Id { get; private set; }
     public Guid DeliveryDriverId { get; private set; }
     public Guid VehicleId { get; private set; }
@@ -9,6 +19,7 @@ public class VehicleRent
     public DateTime? EndedAt { get; private set; }
     public DateTime ExpectedEndingDate { get; private set; }
     public int Plan { get; private set; }
+    public decimal DailyValue { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
     private VehicleRent() { }
@@ -23,12 +34,23 @@ public class VehicleRent
                EndedAt == rent.EndedAt &&
                ExpectedEndingDate == rent.ExpectedEndingDate &&
                Plan == rent.Plan &&
+               DailyValue == rent.DailyValue &&
                CreatedAt == rent.CreatedAt;
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Id, DeliveryDriverId, VehicleId, StartAt, EndedAt, ExpectedEndingDate, Plan, CreatedAt);
+        HashCode hash = new HashCode();
+        hash.Add(Id);
+        hash.Add(DeliveryDriverId);
+        hash.Add(VehicleId);
+        hash.Add(StartAt);
+        hash.Add(EndedAt);
+        hash.Add(ExpectedEndingDate);
+        hash.Add(Plan);
+        hash.Add(DailyValue);
+        hash.Add(CreatedAt);
+        return hash.ToHashCode();
     }
 
     public static Result<VehicleRent> Create(
@@ -51,7 +73,7 @@ public class VehicleRent
         builder.AddIf(endedAt.HasValue && endedAt.Value > expectedEndingDate, CoreExceptionCode.LateReturn);
 
         builder.AddIf(plan <= 0, CoreExceptionCode.InvalidRentalPlan);
-        builder.AddIf(new[] { 7, 15, 30, 45, 50 }.Contains(plan) is false, CoreExceptionCode.InvalidRentalPlan);
+        builder.AddIf(_planDailyValues.TryGetValue(plan, out var dailyValue) is false, CoreExceptionCode.InvalidRentalPlan);
 
         var expectedEndDate = startAt.AddDays(plan);
         builder.AddIf(expectedEndingDate.Date < expectedEndDate.Date, CoreExceptionCode.PlanMismatch);
@@ -67,6 +89,7 @@ public class VehicleRent
                 EndedAt = endedAt,
                 ExpectedEndingDate = expectedEndingDate,
                 Plan = plan,
+                DailyValue = dailyValue,
                 CreatedAt = createdAt ?? DateTime.UtcNow
             };
         });

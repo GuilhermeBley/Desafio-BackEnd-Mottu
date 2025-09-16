@@ -12,7 +12,8 @@ public record CreateDeliveryDriverRequest(
     string Cnpj,
     DateOnly BirthDate,
     string CnhNumber,
-    string CnhCategory)
+    string CnhCategory,
+    Stream? CnhImage = null)
     : IRequest<CreateDeliveryDriverResponse>;
 
 public record CreateDeliveryDriverResponse(Result<DeliveryDriverModel> Result);
@@ -20,10 +21,12 @@ public record CreateDeliveryDriverResponse(Result<DeliveryDriverModel> Result);
 public class CreateDeliveryDriverHandler : IRequestHandler<CreateDeliveryDriverRequest, CreateDeliveryDriverResponse>
 {
     private readonly DataContext _context;
+    private readonly IStreamFileRepository _streamFileRepository;
 
-    public CreateDeliveryDriverHandler(DataContext context)
+    public CreateDeliveryDriverHandler(DataContext context, IStreamFileRepository streamFileRepository)
     {
         _context = context;
+        _streamFileRepository = streamFileRepository;
     }
 
     public async Task<CreateDeliveryDriverResponse> Handle(CreateDeliveryDriverRequest request, CancellationToken cancellationToken)
@@ -78,8 +81,25 @@ public class CreateDeliveryDriverHandler : IRequestHandler<CreateDeliveryDriverR
             return new(Result.Failed<DeliveryDriverModel>(CoreExceptionCode.Conflict));
         }
 
+        await using var transaction 
+            = await _context.Database.BeginTransactionAsync(cancellationToken);
+
         var response = await _context.DeliveryDrivers
             .AddAsync(DeliveryDriverModel.MapFromEntity(result.RequiredResult));
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+
+        if (request.CnhImage is not null)
+        {
+            var uri = await _streamFileRepository.UploadAsync(request.CnhImage, $"{response.Entity.Id}-cnh.png", cancellationToken);
+            await _context
+                .DeliveryDrivers
+                .Where(x => x.Id == response.Entity.Id)
+                .ExecuteUpdateAsync(s => s.SetProperty(x => x.CnhImg, uri.AbsoluteUri));
+        }
+
+        await transaction.CommitAsync();
 
         return new(
             Result.Success(response.Entity));

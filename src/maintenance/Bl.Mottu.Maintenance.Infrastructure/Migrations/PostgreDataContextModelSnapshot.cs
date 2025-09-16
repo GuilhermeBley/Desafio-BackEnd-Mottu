@@ -142,6 +142,10 @@ namespace Bl.Mottu.Maintenance.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
+                    b.Property<decimal>("DailyValue")
+                        .HasColumnType("NUMERIC(11, 2)")
+                        .HasColumnName("daily_value");
+
                     b.Property<Guid>("DeliveryDriverId")
                         .HasColumnType("uuid")
                         .HasColumnName("delivery_driver_id");

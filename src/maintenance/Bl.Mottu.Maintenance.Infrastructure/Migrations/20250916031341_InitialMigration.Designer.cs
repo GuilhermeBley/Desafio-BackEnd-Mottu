@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Bl.Mottu.Maintenance.Infrastructure.Migrations
 {
     [DbContext(typeof(PostgreDataContext))]
-    [Migration("20250916005649_InitialMigration")]
+    [Migration("20250916031341_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -144,6 +144,10 @@ namespace Bl.Mottu.Maintenance.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
+
+                    b.Property<decimal>("DailyValue")
+                        .HasColumnType("NUMERIC(11, 2)")
+                        .HasColumnName("daily_value");
 
                     b.Property<Guid>("DeliveryDriverId")
                         .HasColumnType("uuid")

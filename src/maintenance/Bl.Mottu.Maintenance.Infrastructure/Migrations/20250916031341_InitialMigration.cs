@@ -57,6 +57,7 @@ namespace Bl.Mottu.Maintenance.Infrastructure.Migrations
                     ended_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     expected_ending_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     plan = table.Column<int>(type: "int", nullable: false),
+                    daily_value = table.Column<decimal>(type: "numeric(11,2)", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>

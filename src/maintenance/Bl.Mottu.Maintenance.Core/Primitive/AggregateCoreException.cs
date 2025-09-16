@@ -24,8 +24,8 @@ public class AggregateCoreException : CoreException, ICoreException
     }
 
     public AggregateCoreException(IEnumerable<ICoreException> errors)
+        : this($"Errors:\n{string.Join('\n', errors)}", errors)
     {
-        _errors = errors.ToImmutableArray();
     }
 
     public AggregateCoreException(string? message, IEnumerable<ICoreException> errors) : base(message)

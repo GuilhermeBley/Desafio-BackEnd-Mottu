@@ -72,8 +72,8 @@ public class CreateVehicleRentHandler : IRequestHandler<CreateVehicleRentRequest
             .AsNoTracking()
             .Where(x => x.VehicleId == vehicleFound.Id)
             .Where(x => 
-                (x.StartAt >= request.StartAt && x.ExpectedEndingDate <= request.StartAt) || // checking if the start is in the range
-                (x.StartAt >= request.ExpectedEndingDate && x.ExpectedEndingDate <= request.EndedAt))// checking if the ending is in the range
+                (request.StartAt >= x.StartAt && request.StartAt <= x.ExpectedEndingDate) || // checking if the start is in the range
+                (request.StartAt < x.StartAt && request.ExpectedEndingDate >= x.ExpectedEndingDate))// checking if the ending is in the range
             .AnyAsync(cancellationToken);
 
         if (vehicleIsAlreadyRented)

@@ -12,6 +12,7 @@ public static class DIExtension
             {
                 cfg.RegisterServicesFromAssembly(typeof(Core.Commands.CreateDeliveryDriver.CreateDeliveryDriverHandler).Assembly);
             })
-            .AddDbContext<Core.Repository.DataContext, Repository.PostgreDataContext>();
+            .AddDbContext<Core.Repository.DataContext, Repository.PostgreDataContext>()
+            .AddSingleton<Core.Repository.IStreamFileRepository, Repository.StreamFileRepository>();
     }
 }

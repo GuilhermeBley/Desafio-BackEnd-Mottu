@@ -20,6 +20,7 @@ public class MotorcycleModel
             Code = entity.Code,
             Id = entity.Id,
             Placa = entity.Placa,
+            Year = entity.Year,
         };
     }
 }

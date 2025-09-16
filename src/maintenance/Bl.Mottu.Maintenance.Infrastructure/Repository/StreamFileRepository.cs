@@ -12,7 +12,7 @@ internal class StreamFileRepository : IStreamFileRepository
     private readonly BlobContainerClient _container;
     private bool _containerCreated;
 
-    public StreamFileRepository(IOptions<StorageAccountOption> options)
+    public StreamFileRepository(IOptions<StorageAccountConfig> options)
     {
         var blobClient = new BlobServiceClient(options.Value.ConnectionString);
         _container = blobClient.GetBlobContainerClient(Container);

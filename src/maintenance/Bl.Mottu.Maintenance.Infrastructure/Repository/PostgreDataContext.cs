@@ -7,18 +7,19 @@ using Microsoft.Extensions.Options;
 
 namespace Bl.Mottu.Maintenance.Infrastructure.Repository;
 
-internal class PostgreDataContext : DataContext
+public class PostgreDataContext(IOptions<PostgreConfig>? Options = null) : DataContext
 {
-    private readonly IOptions<PostgreConfig> _options;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
 
-        var config = _options;
-        optionsBuilder.UseNpgsql(config.Value.ConnectionString, opt =>
+        var config = Options?.Value ?? new() { ConnectionString = "Host=localhost;Port=5432;Database=mydatabase;Username=myuser;Password=mypassword;" };
+        optionsBuilder.UseNpgsql(config.ConnectionString, opt =>
         {
+            
         });
+        
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -33,24 +34,24 @@ internal class PostgreDataContext : DataContext
 
             b.Property(p => p.Id)
                 .HasColumnName("id")
-                .HasColumnType("uniqueidentifier")
+                .HasColumnType("uuid")
                 .IsRequired();
 
             b.Property(p => p.Code)
                 .HasColumnName("code")
-                .HasColumnType("nvarchar(150)")
+                .HasColumnType("varchar(150)")
                 .HasMaxLength(150)
                 .IsRequired();
 
             b.Property(p => p.Name)
                 .HasColumnName("name")
-                .HasColumnType("nvarchar(500)")
+                .HasColumnType("varchar(500)")
                 .HasMaxLength(500)
                 .IsRequired();
 
             b.Property(p => p.Cnpj)
                 .HasColumnName("cnpj")
-                .HasColumnType("nvarchar(14)")
+                .HasColumnType("varchar(14)")
                 .HasMaxLength(14)
                 .IsRequired();
 
@@ -61,25 +62,25 @@ internal class PostgreDataContext : DataContext
 
             b.Property(p => p.CnhNumber)
                 .HasColumnName("cnh_number")
-                .HasColumnType("nvarchar(11)")
+                .HasColumnType("varchar(11)")
                 .HasMaxLength(11)
                 .IsRequired();
 
             b.Property(p => p.CnhCategory)
                 .HasColumnName("cnh_category")
-                .HasColumnType("nvarchar(10)")
+                .HasColumnType("varchar(10)")
                 .HasMaxLength(10)
                 .IsRequired();
 
             b.Property(p => p.CnhImg)
                 .HasColumnName("cnh_img")
-                .HasColumnType("nvarchar(250)")
+                .HasColumnType("varchar(250)")
                 .HasMaxLength(250)
                 .IsRequired(false);
 
             b.Property(p => p.CreatedAt)
                 .HasColumnName("created_at")
-                .HasColumnType("datetime2")
+                .HasColumnType("timestamp with time zone")
                 .IsRequired();
 
             b.HasIndex(p => p.Code)
@@ -99,24 +100,24 @@ internal class PostgreDataContext : DataContext
 
             b.Property(p => p.Id)
                 .HasColumnName("id")
-                .HasColumnType("uniqueidentifier")
+                .HasColumnType("uuid")
                 .IsRequired();
 
             b.Property(p => p.Code)
                 .HasColumnName("code")
-                .HasColumnType("nvarchar(150)")
+                .HasColumnType("varchar(150)")
                 .HasMaxLength(150)
                 .IsRequired();
 
             b.Property(p => p.Placa)
                 .HasColumnName("placa")
-                .HasColumnType("nvarchar(7)")
+                .HasColumnType("varchar(7)")
                 .HasMaxLength(7)
                 .IsRequired();
 
             b.Property(p => p.Model)
                 .HasColumnName("model")
-                .HasColumnType("nvarchar(250)")
+                .HasColumnType("varchar(250)")
                 .HasMaxLength(250)
                 .IsRequired();
 
@@ -127,7 +128,7 @@ internal class PostgreDataContext : DataContext
 
             b.Property(p => p.CreatedAt)
                 .HasColumnName("created_at")
-                .HasColumnType("datetime2")
+                .HasColumnType("timestamp with time zone")
                 .IsRequired();
 
             b.HasIndex(p => p.Placa)
@@ -147,32 +148,32 @@ internal class PostgreDataContext : DataContext
 
             b.Property(p => p.Id)
                 .HasColumnName("id")
-                .HasColumnType("uniqueidentifier")
+                .HasColumnType("uuid")
                 .IsRequired();
 
             b.Property(p => p.DeliveryDriverId)
                 .HasColumnName("delivery_driver_id")
-                .HasColumnType("uniqueidentifier")
+                .HasColumnType("uuid")
                 .IsRequired();
 
             b.Property(p => p.VehicleId)
                 .HasColumnName("vehicle_id")
-                .HasColumnType("uniqueidentifier")
+                .HasColumnType("uuid")
                 .IsRequired();
 
             b.Property(p => p.StartAt)
                 .HasColumnName("start_at")
-                .HasColumnType("datetime2")
+                .HasColumnType("timestamp with time zone")
                 .IsRequired();
 
             b.Property(p => p.EndedAt)
                 .HasColumnName("ended_at")
-                .HasColumnType("datetime2")
+                .HasColumnType("timestamp with time zone")
                 .IsRequired(false);
 
             b.Property(p => p.ExpectedEndingDate)
                 .HasColumnName("expected_ending_date")
-                .HasColumnType("datetime2")
+                .HasColumnType("timestamp with time zone")
                 .IsRequired();
 
             b.Property(p => p.Plan)
@@ -182,7 +183,7 @@ internal class PostgreDataContext : DataContext
 
             b.Property(p => p.CreatedAt)
                 .HasColumnName("created_at")
-                .HasColumnType("datetime2")
+                .HasColumnType("timestamp with time zone")
                 .IsRequired();
 
             b.HasOne<DeliveryDriverModel>()

@@ -49,11 +49,12 @@ public class CreateMotorcycleHandler : IRequestHandler<CreateMotorcycleRequest, 
             MotorcycleModel.MapFromEntity(motorcycle));
         await _context.SaveChangesAsync();
 
-        await _bus.PublishAsync(new CreatedMotorcycleEvent()
-        {
-            Placa = result.Entity.Placa,
-            Year = result.Entity.Year,
-        });
+        // TODO: publish an event on creating motorcycle
+        //await _bus.PublishAsync(new CreatedMotorcycleEvent()
+        //{
+        //    Placa = result.Entity.Placa,
+        //    Year = result.Entity.Year,
+        //});
 
         return new(Result.Success(result.Entity));
     }

@@ -25,8 +25,13 @@ public static class DIExtension
                 var opt = sp.GetRequiredService<IOptions<RabbitMqConfig>>();
                 var factory = new ConnectionFactory
                 {
-                    Uri = new Uri(opt.Value.ConnectionString),
-                    DispatchConsumersAsync = true
+                    HostName = opt.Value.HostName,
+                    Port = AmqpTcpEndpoint.DefaultAmqpSslPort,
+                    UserName = opt.Value.UserName,
+                    Password = opt.Value.Password,
+                    VirtualHost = "/",
+                    DispatchConsumersAsync = true,
+                    RequestedHeartbeat = TimeSpan.FromSeconds(60),
                 };
                 return factory.CreateConnection();
             });

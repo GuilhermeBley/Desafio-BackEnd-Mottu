@@ -28,7 +28,7 @@ services:
     command: azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0 --loose
 
   rabbitmq:
-    image: rabbitmq:3-management-alpine
+    image: rabbitmq:3-management
     container_name: mottu-app-rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: guest
@@ -54,7 +54,9 @@ services:
       - PostgreConfig__ConnectionString=Host=postgres;Port=5432;Database=myappdb;Username=postgres;Password=postgrespassword
       - PostgreConfig__ExecuteMigrations=true
       - StorageAccountConfig__ConnectionString=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;
-      - RabbitMqConfig__ConnectionString=amqp://guest:guest@localhost:5672/
+      - RabbitMqConfig__HostName=localhost
+      - RabbitMqConfig__UserName=guest
+      - RabbitMqConfig__Password=guest
     depends_on:
       postgres:
         condition: service_healthy

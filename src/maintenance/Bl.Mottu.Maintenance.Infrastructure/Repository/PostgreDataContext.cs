@@ -3,6 +3,7 @@ using Bl.Mottu.Maintenance.Core.Repository;
 using Bl.Mottu.Maintenance.Infrastructure.Config;
 using Bl.Mottu.Maintenance.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace Bl.Mottu.Maintenance.Infrastructure.Repository;
@@ -212,5 +213,20 @@ public class PostgreDataContext(IOptions<PostgreConfig>? Options = null) : DataC
             b.HasIndex(p => p.EndedAt)
                 .HasDatabaseName("ix_VehicleRent_EndedAt");
         });
+    }
+
+    public static async Task<bool> ExecuteMigrationsAsync(IServiceProvider provider, CancellationToken cancellationToken = default)
+    {
+        var opt = provider.GetRequiredService<IOptions<PostgreConfig>>();
+
+        if (opt.Value.ExecuteMigrations is false) return false;
+
+        await using var scope = provider.CreateAsyncScope();
+
+        var ctx = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+        await ctx.Database.MigrateAsync(cancellationToken);
+
+        return true;
     }
 }

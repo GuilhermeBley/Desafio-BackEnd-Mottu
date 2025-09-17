@@ -14,7 +14,7 @@ public class CreateVehicleRentViewModel
     public DateTimeOffset DataInicio { get; set; }
 
     [JsonPropertyName("data_termino")]
-    public DateTimeOffset DataTermino { get; set; }
+    public DateTimeOffset? DataTermino { get; set; }
 
     [JsonPropertyName("data_previsao_termino")]
     public DateTimeOffset DataPrevisaoTermino { get; set; }

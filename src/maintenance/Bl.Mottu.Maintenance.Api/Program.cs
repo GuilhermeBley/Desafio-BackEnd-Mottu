@@ -1,13 +1,18 @@
 using Bl.Mottu.Maintenance.Api.Model;
-using Bl.Mottu.Maintenance.Core.Model;
 using Bl.Mottu.Maintenance.Infrastructure.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Numerics;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddSwaggerGen();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c => {
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Mottu.Api",
+        Version = "v1"
+    });
+});
 
 builder.Services.AddInfrastructure();
 
@@ -18,6 +23,8 @@ builder.Services.Configure<Bl.Mottu.Maintenance.Infrastructure.Config.StorageAcc
      builder.Configuration.GetSection("StorageAccountConfig"));
 
 var app = builder.Build();
+
+await Bl.Mottu.Maintenance.Infrastructure.Repository.PostgreDataContext.ExecuteMigrationsAsync(app.Services);
 
 app.UseSwagger();
 app.UseSwaggerUI();
@@ -161,7 +168,7 @@ app.MapPost("/locacao", async (
         DeliveryDriverCode: model.EntregadorId ?? string.Empty,
         VehicleCode: model.MotoId ?? string.Empty,
         StartAt: model.DataInicio.UtcDateTime,
-        EndedAt: model.DataTermino.UtcDateTime,
+        EndedAt: model.DataTermino?.UtcDateTime,
         ExpectedEndingDate: model.DataPrevisaoTermino.UtcDateTime,
         Plan: model.Plano),
         cancellationToken);

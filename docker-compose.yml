@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: mottu-app-postgre
+    environment:
+      POSTGRES_DB: myappdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: mottu-app-azurite
+    ports:
+      - "10000:10000" # Blob service
+    volumes:
+      - azurite_data:/data
+    command: azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0 --loose
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: mottu-app-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"   # AMQP protocol
+      - "15672:15672" # Management UI
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # .NET application
+  dotnet-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - PostgreConfig__ConnectionString=Host=postgres;Port=5432;Database=myappdb;Username=postgres;Password=postgrespassword
+      - PostgreConfig__ExecuteMigrations=true
+      - StorageAccountConfig__ConnectionString=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;
+      - RabbitMQ__ConnectionString=amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: >
+      sh -c "
+      echo 'Waiting for database to be ready...' &&
+      sleep 10 &&
+      dotnet Bl.Mottu.Maintenance.Api.dll
+      "
+
+volumes:
+  postgres_data:
+  azurite_data:

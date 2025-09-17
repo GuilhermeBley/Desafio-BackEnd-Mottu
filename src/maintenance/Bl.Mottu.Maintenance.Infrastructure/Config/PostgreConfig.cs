@@ -6,4 +6,5 @@ public class PostgreConfig
 {
     [Required, StringLength(maximumLength: int.MaxValue, MinimumLength = 10)]
     public string ConnectionString { get; set; } = string.Empty;
+    public bool ExecuteMigrations { get; set; } = false;
 }

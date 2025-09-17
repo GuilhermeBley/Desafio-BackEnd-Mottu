@@ -22,6 +22,9 @@ builder.Services.Configure<Bl.Mottu.Maintenance.Infrastructure.Config.PostgreCon
 builder.Services.Configure<Bl.Mottu.Maintenance.Infrastructure.Config.StorageAccountConfig>(
      builder.Configuration.GetSection("StorageAccountConfig"));
 
+builder.Services.Configure<Bl.Mottu.Maintenance.Infrastructure.Config.RabbitMqConfig>(
+     builder.Configuration.GetSection("RabbitMqConfig"));
+
 var app = builder.Build();
 
 await Bl.Mottu.Maintenance.Infrastructure.Repository.PostgreDataContext.ExecuteMigrationsAsync(app.Services);
@@ -135,7 +138,20 @@ app.MapPost("/entregadores", async (
         CnhImage: model.GetCnhImage()), // TODO: dispose this
         cancellationToken);
 
-    if (response.Result.IsSuccess) return Results.Created();
+    if (response.Result.IsSuccess)
+    {
+        var result = response.Result.RequiredResult;
+        return Results.Created(
+            $"entregadores/{result.Code}",
+            new
+            {
+                Id = result.Id,
+                result.Cnpj,
+                result.CnhNumber,
+                result.CnhImg,
+                result.Code,
+            });
+    }
 
     return Results.BadRequest(new ResultViewModel("Dados inválidos"));
 });
@@ -173,7 +189,18 @@ app.MapPost("/locacao", async (
         Plan: model.Plano),
         cancellationToken);
 
-    if (response.Result.IsSuccess) return Results.Created();
+    if (response.Result.IsSuccess)
+    {
+        var result = response.Result.RequiredResult;
+        return Results.Created(
+            $"locacao/{result.Id}",
+            new
+            {
+                Id = result.Id,
+                result.VehicleId,
+                result.CreatedAt,
+            });
+    }
 
     return Results.BadRequest(new ResultViewModel("Dados inválidos"));
 });

@@ -1,4 +1,5 @@
 ﻿using Bl.Mottu.Maintenance.Core.Entities;
+using Bl.Mottu.Maintenance.Core.Events;
 using Bl.Mottu.Maintenance.Core.Model;
 using Bl.Mottu.Maintenance.Core.Repository;
 
@@ -16,10 +17,12 @@ public record CreateMotorcycleRequest(
 public class CreateMotorcycleHandler : IRequestHandler<CreateMotorcycleRequest, CreateMotorcycleResponse>
 {
     private readonly DataContext _context;
+    private readonly IEventBus _bus;
 
-    public CreateMotorcycleHandler(DataContext context)
+    public CreateMotorcycleHandler(DataContext context, IEventBus bus)
     {
         _context = context;
+        _bus = bus;
     }
 
     public async Task<CreateMotorcycleResponse> Handle(CreateMotorcycleRequest request, CancellationToken cancellationToken)
@@ -45,6 +48,12 @@ public class CreateMotorcycleHandler : IRequestHandler<CreateMotorcycleRequest, 
         var result = await _context.Motorcycles.AddAsync(
             MotorcycleModel.MapFromEntity(motorcycle));
         await _context.SaveChangesAsync();
+
+        await _bus.PublishAsync(new CreatedMotorcycleEvent()
+        {
+            Placa = result.Entity.Placa,
+            Year = result.Entity.Year,
+        });
 
         return new(Result.Success(result.Entity));
     }
